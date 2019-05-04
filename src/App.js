@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './App.css';
 
-
+import Settings from './components/dialogs'
 
 class Point {
   constructor(x, y) {
@@ -132,6 +132,7 @@ function App() {
 
   return (
     <div>
+      <Settings />
       <canvas id="canvas" width="1900" height="1000"></canvas>
     </div>
   );
