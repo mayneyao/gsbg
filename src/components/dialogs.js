@@ -2,7 +2,6 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import Settings from './settings'
 
@@ -23,16 +22,18 @@ function AlertDialogSlide() {
 
     return (
         <div>
-            <Button onClick={handleClickOpen}>Slide in alert dialog</Button>
+            <Button onClick={handleClickOpen}>配置画布</Button>
             <Dialog
                 open={open}
                 TransitionComponent={Transition}
                 keepMounted
+                fullWidth
+                maxWidth={'xs'}
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-slide-title"
                 aria-describedby="alert-dialog-slide-description"
             >
-                <DialogTitle id="alert-dialog-slide-title">{"Use Google's location service?"}</DialogTitle>
+                {/* <DialogTitle id="alert-dialog-slide-title">{"调整画图参数重新生成背景图"}</DialogTitle> */}
                 <DialogContent>
                     <Settings />
                 </DialogContent>

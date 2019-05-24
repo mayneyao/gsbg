@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
-
 import Settings from './components/dialogs'
+import { ConfigContext, config } from './context'
 
 class Point {
   constructor(x, y) {
@@ -91,16 +91,38 @@ function getRandomShape() {
   return Shape[Math.floor(Math.random() * Shape.length)]
 }
 
-function App() {
-  useEffect(() => {
+class GSBG extends React.Component {
+  static contextType = ConfigContext;
+
+
+
+  updateCanvas = (newContext) => {
+    const { size, theme, column } = newContext ? newContext : this.context
+    console.log(theme)
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
+
+    ctx.height = size.height
+    ctx.width = size.width
+    ctx.fillStyle = "#fff"
+
+    if (theme === "light") {
+      ctx.fillStyle = "#fff"
+    } else if (theme === "dark") {
+      ctx.fillStyle = "#000"
+    }
+    ctx.beginPath();
+    ctx.fillRect(0, 0, size.width, size.height);
+    ctx.closePath();
+
     // ctx.fillStyle = 'black';
     // ctx.fillRect(0, 0, 1900, 1000);
     ctx.save()
-    let width = 100;
-    let xnums = 20;
-    let ynums = 10;
+
+    let width = size.width / parseInt(column);
+    console.log(width)
+    let xnums = parseInt(column);
+    let ynums = size.height / width;
     let v = 0.4
     for (let i = 0; i < xnums; i++) {
       for (let j = 0; j < ynums; j++) {
@@ -113,14 +135,13 @@ function App() {
           switch (shape) {
             case 'triangle':
               let [a, b, c] = getRandomTriPoint(i * width, j * width, width, width)
-              if (calcTriangleArea(a, b, c) > 400) {
+              if (calcTriangleArea(a, b, c) > width * width / 16) {
                 drawTri(ctx, a, b, c, color)
               }
               break
             case 'rect':
-              console.log(1)
               let [rx, ry, rWidth, rHeight] = getRandomRectParams(i * width, j * width, width, width)
-              if (rWidth > 10) {
+              if (rWidth > width / 8) {
                 roundedRect(ctx, rx, ry, rWidth, rHeight, 0, color);
               }
               break
@@ -128,14 +149,87 @@ function App() {
         }
       }
     }
-  })
+  }
+  componentDidMount() {
+    this.updateCanvas()
+  }
 
-  return (
-    <div>
-      <Settings />
-      <canvas id="canvas" width="1900" height="1000"></canvas>
-    </div>
-  );
+  componentWillReceiveProps(newProps, newContext) {
+    if (this.context.count !== newContext.count) {
+      this.updateCanvas(newContext)
+    }
+
+  }
+
+  render() {
+
+    return (
+      <ConfigContext.Consumer>
+        {
+          config => {
+            const { size: { width, height }, theme } = config;
+            console.log(theme)
+            return (
+              <canvas id="canvas" width={width} height={height} style={{
+                background: theme === 'dark' ? "#000" : '#fff'
+              }}></canvas>
+            )
+          }
+        }
+
+      </ConfigContext.Consumer >
+    );
+  }
 }
 
-export default App;
+
+
+
+class App extends React.Component {
+  handleThemeChange = (e) => {
+    console.log(e.target)
+    this.setState(state => ({
+      theme: state.theme === 'dark' ? 'light' : 'dark'
+    }))
+  }
+
+  handleChange = name => e => {
+    const value = parseFloat(e.target.value)
+    this.setState(state => ({
+      size: {
+        width: name === 'width' ? value : state.size.width,
+        height: name === 'height' ? value : state.size.height
+      },
+      content: {
+        rect: name === 'rect' ? value : state.content.rect,
+        triangle: name === 'triangle' ? value : state.content.triangle,
+      },
+      column: name === 'column' ? value : state.column,
+    }))
+  }
+  updateCanvas = () => {
+    this.setState(state => ({
+      count: state.count + 1
+    }))
+  }
+  constructor(props) {
+    super(props);
+    this.state = {
+      ...config,
+      handleThemeChange: this.handleThemeChange,
+      handleChange: this.handleChange,
+      updateCanvas: this.updateCanvas
+    }
+  }
+
+  render() {
+    return (
+      <ConfigContext.Provider value={this.state}>
+        <Settings />
+        <GSBG />
+      </ConfigContext.Provider>
+    )
+  }
+}
+
+export default App
