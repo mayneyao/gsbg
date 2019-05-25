@@ -72,6 +72,7 @@ class App extends React.Component {
           </div>
 
           1. 如果您使用 AdBlock 插件，可能无法在新窗口中正常预览。
+          2. iOS 用户在预览窗口中长按图片保存。
 
         </div>
       </ConfigContext.Provider>
