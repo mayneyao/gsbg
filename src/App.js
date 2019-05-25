@@ -45,6 +45,16 @@ class App extends React.Component {
     }
   }
 
+  componentDidMount() {
+    let sw = window.screen.width * window.devicePixelRatio
+    let sh = window.screen.height * window.devicePixelRatio
+    this.setState({
+      size: {
+        width: sw,
+        height: sh
+      },
+    })
+  }
   render() {
     return (
       <ConfigContext.Provider value={this.state}>
